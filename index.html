@@ -86,8 +86,8 @@
 
     <script>
         let map;
-        let markers; // Marker cluster group for points
-        let allPointsData = []; // To store parsed point data (lat, lon, other properties) for analysis
+        let markers; // Marker cluster group for points from filtered_unmet_demand.csv
+        let allPointsData = []; // To store parsed point data (lat, lon, other properties) for polygon analysis
         let highlightedPolygon = null; // To keep track of the currently highlighted polygon
 
         // Define default and highlight styles for polygons
@@ -114,16 +114,19 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            // Initialize the MarkerClusterGroup with maxClusterRadius option
+            // Initialize the MarkerClusterGroup for filtered_unmet_demand.csv points
             markers = L.markerClusterGroup({
                 maxClusterRadius: 40 // Experiment with this value (default is 80)
             });
             
-            // First, load and process the points (CSV)
+            // 1. Load and process the clustered points (from filtered_unmet_demand.csv)
             await addPointsFromCSV();
 
-            // Then, load the polygons (KML)
+            // 2. Load the polygons (from merged_polygons.xml)
             await addPolygonsFromKML();
+
+            // 3. Load the bike racks (from cykelstativ.csv) as black dots
+            await addBikeRacksFromCSV();
         }
 
         async function addPointsFromCSV() {
@@ -137,7 +140,7 @@
                         const errors = results.errors;
 
                         if (errors.length > 0) {
-                            console.warn("Papa Parse encountered errors:", errors);
+                            console.warn("Papa Parse encountered errors for filtered_unmet_demand.csv:", errors);
                         }
 
                         data.forEach((row, index) => {
@@ -159,28 +162,100 @@
                                         });
                                         markers.addLayer(marker); // Add marker to the cluster group
                                     } else {
-                                        console.warn(`Skipping row ${index + 2}: Invalid latitude or longitude in 'coordinates_search': ${coordinatesString}`);
+                                        console.warn(`Skipping row ${index + 2} in filtered_unmet_demand.csv: Invalid lat/lon: ${coordinatesString}`);
                                     }
                                 } else {
-                                    console.warn(`Skipping row ${index + 2}: Malformed 'coordinates_search' format: ${coordinatesString}`);
+                                    console.warn(`Skipping row ${index + 2} in filtered_unmet_demand.csv: Malformed coordinates: ${coordinatesString}`);
                                 }
                             } else {
-                                console.warn(`Skipping row ${index + 2}: 'coordinates_search' column is empty.`);
+                                console.warn(`Skipping row ${index + 2} in filtered_unmet_demand.csv: 'coordinates_search' is empty.`);
                             }
                         });
 
                         map.addLayer(markers);
-                        console.log(`Added ${markers.getLayers().length} points from CSV.`);
+                        console.log(`Added ${markers.getLayers().length} points from filtered_unmet_demand.csv.`);
                         resolve();
                     },
                     error: function(err) {
-                        console.error("Papa Parse error during download or parsing:", err);
+                        console.error("Papa Parse error for filtered_unmet_demand.csv:", err);
                         alert("Could not load demand data. Check console for details.");
                         reject(err);
                     }
                 });
             });
         }
+
+        // New function to add bike racks from cykelstativ.csv
+        async function addBikeRacksFromCSV() {
+            return new Promise((resolve, reject) => {
+                Papa.parse('cykelstativ.csv', {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const data = results.data;
+                        const errors = results.errors;
+                        let addedBikeRacks = 0;
+
+                        if (errors.length > 0) {
+                            console.warn("Papa Parse encountered errors for cykelstativ.csv:", errors);
+                        }
+
+                        data.forEach((row, index) => {
+                            const wkbGeometry = row['wkb_geometry'];
+                            
+                            if (wkbGeometry && wkbGeometry.startsWith('POINT (')) {
+                                const coordsMatch = wkbGeometry.match(/\(([^)]+)\)/); // Extracts content inside parentheses
+                                if (coordsMatch && coordsMatch[1]) {
+                                    const coordParts = coordsMatch[1].split(' ');
+                                    if (coordParts.length === 2) {
+                                        const lon = parseFloat(coordParts[0]);
+                                        const lat = parseFloat(coordParts[1]);
+                                        
+                                        if (!isNaN(lat) && !isNaN(lon)) {
+                                            // Create a black circle marker (dot)
+                                            const circle = L.circleMarker([lat, lon], {
+                                                radius: 4, // Size of the dot
+                                                fillColor: '#000000', // Black fill
+                                                color: '#000000', // Black border
+                                                weight: 1, // Border thickness
+                                                opacity: 1, // Border opacity
+                                                fillOpacity: 1 // Fill opacity
+                                            }).addTo(map); // Add directly to map, not to cluster group
+
+                                            // Optional: Add a popup with relevant info
+                                            circle.bindPopup(`
+                                                <b>Stativ Type:</b> ${row['stativ_type'] || 'N/A'}<br>
+                                                <b>Placering:</b> ${row['stativ_placering'] || 'N/A'}<br>
+                                                <b>Antal Pladser:</b> ${row['antal_pladser'] || 'N/A'}
+                                            `);
+                                            addedBikeRacks++;
+                                        } else {
+                                            console.warn(`Skipping row ${index + 2} in cykelstativ.csv: Invalid lat/lon in wkb_geometry: ${wkbGeometry}`);
+                                        }
+                                    } else {
+                                        console.warn(`Skipping row ${index + 2} in cykelstativ.csv: Malformed wkb_geometry format: ${wkbGeometry}`);
+                                    }
+                                } else {
+                                    console.warn(`Skipping row ${index + 2} in cykelstativ.csv: Could not parse coordinates from wkb_geometry: ${wkbGeometry}`);
+                                }
+                            } else {
+                                console.warn(`Skipping row ${index + 2} in cykelstativ.csv: 'wkb_geometry' column is missing or invalid.`);
+                            }
+                        });
+
+                        console.log(`Added ${addedBikeRacks} bike racks from cykelstativ.csv.`);
+                        resolve();
+                    },
+                    error: function(err) {
+                        console.error("Papa Parse error for cykelstativ.csv:", err);
+                        alert("Could not load bike rack data. Check console for details.");
+                        reject(err);
+                    }
+                });
+            });
+        }
+
 
         // Function to highlight a polygon layer on the map
         function highlightPolygon(layer) {
@@ -225,58 +300,3 @@
                             });
 
                             // Store data including the Leaflet layer reference
-                            polygonsForDisplay.push({
-                                name: polygonName,
-                                pointsCount: pointsInside,
-                                layer: layer // Store reference to the actual Leaflet layer
-                            });
-
-                            // Add existing click listener for map popups
-                            layer.on('click', function(e) {
-                                const clickedPolygon = e.target;
-                                let clickedPointsInside = 0;
-                                allPointsData.forEach(pointData => {
-                                    const point = turf.point([pointData.lon, pointData.lat]);
-                                    if (turf.booleanPointInPolygon(point, clickedPolygon.toGeoJSON())) {
-                                        clickedPointsInside++;
-                                    }
-                                });
-                                clickedPolygon.bindPopup(`Points within: <b>${clickedPointsInside}</b>`).openPopup(e.latlng);
-                                highlightPolygon(clickedPolygon); // Highlight when clicked on map as well
-                            });
-                        }
-                    });
-
-                    // Sort the polygons by number of points (descending)
-                    polygonsForDisplay.sort((a, b) => b.pointsCount - a.pointsCount);
-
-                    // Build and populate the list from the sorted array
-                    const fragment = document.createDocumentFragment();
-                    polygonsForDisplay.forEach(polygonData => {
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `<span class="polygon-name">${polygonData.name}</span>: <span class="point-count">${polygonData.pointsCount} points</span>`;
-                        
-                        // Add click listener to the list item
-                        listItem.addEventListener('click', () => {
-                            highlightPolygon(polygonData.layer); // Call highlight function with the stored layer
-                        });
-                        fragment.appendChild(listItem);
-                    });
-
-                    polygonCountsList.appendChild(fragment);
-                    console.log(`Added polygons from KML, sorted list, and configured highlighting.`);
-                    resolve();
-                })
-                .on('error', function(error) {
-                    console.error("Error loading KML:", error);
-                    alert("Could not load polygon data. Check console for details.");
-                    reject(error);
-                })
-                .addTo(map);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', initMap);
-    </script>
-</body>
-</html>
