@@ -300,3 +300,58 @@
                             });
 
                             // Store data including the Leaflet layer reference
+                            polygonsForDisplay.push({
+                                name: polygonName,
+                                pointsCount: pointsInside,
+                                layer: layer // Store reference to the actual Leaflet layer
+                            });
+
+                            // Add existing click listener for map popups
+                            layer.on('click', function(e) {
+                                const clickedPolygon = e.target;
+                                let clickedPointsInside = 0;
+                                allPointsData.forEach(pointData => {
+                                    const point = turf.point([pointData.lon, pointData.lat]);
+                                    if (turf.booleanPointInPolygon(point, clickedPolygon.toGeoJSON())) {
+                                        clickedPointsInside++;
+                                    }
+                                });
+                                clickedPolygon.bindPopup(`Points within: <b>${clickedPointsInside}</b>`).openPopup(e.latlng);
+                                highlightPolygon(clickedPolygon); // Highlight when clicked on map as well
+                            });
+                        }
+                    });
+
+                    // Sort the polygons by number of points (descending)
+                    polygonsForDisplay.sort((a, b) => b.pointsCount - a.pointsCount);
+
+                    // Build and populate the list from the sorted array
+                    const fragment = document.createDocumentFragment();
+                    polygonsForDisplay.forEach(polygonData => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<span class="polygon-name">${polygonData.name}</span>: <span class="point-count">${polygonData.pointsCount} points</span>`;
+                        
+                        // Add click listener to the list item
+                        listItem.addEventListener('click', () => {
+                            highlightPolygon(polygonData.layer); // Call highlight function with the stored layer
+                        });
+                        fragment.appendChild(listItem);
+                    });
+
+                    polygonCountsList.appendChild(fragment);
+                    console.log(`Added polygons from KML, sorted list, and configured highlighting.`);
+                    resolve();
+                })
+                .on('error', function(error) {
+                    console.error("Error loading KML:", error);
+                    alert("Could not load polygon data. Check console for details.");
+                    reject(error);
+                })
+                .addTo(map);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>
