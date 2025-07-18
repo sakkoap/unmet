@@ -30,6 +30,8 @@
 
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
     <script>
         let map;
         let markers; // Declare the marker cluster group
@@ -50,60 +52,62 @@
 
         async function addPointsFromCSV() {
             try {
-                // Fetch the CSV file
-                const response = await fetch('filtered_unmet_demand.csv');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const csvText = await response.text();
+                // Use Papa Parse to fetch and parse the CSV file
+                Papa.parse('filtered_unmet_demand.csv', {
+                    download: true, // Tells Papa Parse to download the file
+                    header: true,   // Assumes the first row is the header
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const data = results.data;
+                        const errors = results.errors;
 
-                // Parse the CSV data
-                const lines = csvText.trim().split('\n');
-                const header = lines[0].split(','); // Assuming comma-separated
-                
-                // Find column index for the 'coordinates_search' column
-                const coordinatesSearchIndex = header.indexOf('coordinates_search'); 
-
-                if (coordinatesSearchIndex === -1) {
-                    console.error("CSV must contain a 'coordinates_search' column.");
-                    alert("Error: Missing 'coordinates_search' column in CSV.");
-                    return;
-                }
-
-                for (let i = 1; i < lines.length; i++) { // Start from 1 to skip header
-                    const values = lines[i].split(',');
-                    const coordinatesString = values[coordinatesSearchIndex];
-
-                    // Split the 'coordinates_search' string into latitude and longitude
-                    const coordParts = coordinatesString.split(',');
-                    if (coordParts.length === 2) {
-                        const lat = parseFloat(coordParts[0]);
-                        const lon = parseFloat(coordParts[1]);
-                    
-                        if (!isNaN(lat) && !isNaN(lon)) {
-                            const marker = L.marker([lat, lon]);
-                            // Optional: Add a popup for each marker
-                            marker.bindPopup(`Coordinates: ${coordinatesString}`); 
-                            // You can customize the popup content with more data from your CSV, e.g.,
-                            // marker.bindPopup(`<b>${values[header.indexOf('another_column')]}</b><br>Coordinates: ${coordinatesString}`);
-
-                            markers.addLayer(marker); // Add marker to the cluster group
-                        } else {
-                            console.warn(`Skipping row ${i+1}: Invalid coordinates in 'coordinates_search': ${coordinatesString}`);
+                        if (errors.length > 0) {
+                            console.warn("Papa Parse encountered errors:", errors);
+                            // Optionally, display these errors to the user
                         }
-                    } else {
-                        console.warn(`Skipping row ${i+1}: Malformed 'coordinates_search' format: ${coordinatesString}`);
+
+                        // Loop through the parsed data
+                        data.forEach((row, index) => {
+                            const coordinatesString = row['coordinates_search']; // Access by column name
+                            
+                            if (coordinatesString) { // Ensure the coordinate string exists
+                                const coordParts = coordinatesString.split(',');
+                                if (coordParts.length === 2) {
+                                    const lat = parseFloat(coordParts[0]);
+                                    const lon = parseFloat(coordParts[1]);
+                                    
+                                    if (!isNaN(lat) && !isNaN(lon)) {
+                                        const marker = L.marker([lat, lon]);
+                                        // Optional: Add a popup for each marker
+                                        // You can access other columns like: `row['other_column_name']`
+                                        marker.bindPopup(`Coordinates: ${coordinatesString}`); 
+                                        
+                                        markers.addLayer(marker); // Add marker to the cluster group
+                                    } else {
+                                        console.warn(`Skipping row ${index + 2}: Invalid latitude or longitude in 'coordinates_search': ${coordinatesString}`);
+                                    }
+                                } else {
+                                    console.warn(`Skipping row ${index + 2}: Malformed 'coordinates_search' format: ${coordinatesString}`);
+                                }
+                            } else {
+                                console.warn(`Skipping row ${index + 2}: 'coordinates_search' column is empty.`);
+                            }
+                        });
+
+                        // Add the cluster group to the map once all markers are added
+                        map.addLayer(markers);
+                        console.log(`Added ${markers.getLayers().length} points from CSV.`);
+                    },
+                    error: function(err) {
+                        console.error("Papa Parse error during download or parsing:", err);
+                        alert("Could not load demand data. Check console for details.");
                     }
-                }
-
-                // Add the cluster group to the map
-                map.addLayer(markers);
-
-                console.log(`Added ${markers.getLayers().length} points from CSV.`);
+                });
 
             } catch (error) {
-                console.error("Error loading or processing CSV data:", error);
-                alert("Could not load demand data. Check console for details.");
+                // This catch block will primarily handle network errors before Papa Parse starts
+                console.error("Network error fetching CSV:", error);
+                alert("Network error fetching CSV. Check console for details.");
             }
         }
 
