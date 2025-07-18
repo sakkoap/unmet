@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Copenhagen Map (OSM)</title>
+    <title>Copenhagen Map with Clustered Points (OSM)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
     <style>
-        /* Always set the map height explicitly to define the size of the div */
         #map {
-            height: 100vh; /* Use 100% of the viewport height */
-            width: 100vw;  /* Use 100% of the viewport width */
+            height: 100vh;
+            width: 100vw;
         }
-        /* Optional: Makes the body take up the entire viewport */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent scrollbars if map takes full viewport */
+            overflow: hidden;
         }
     </style>
 </head>
@@ -27,25 +28,86 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
     <script>
-        let map; // Declare map variable
+        let map;
+        let markers; // Declare the marker cluster group
 
-        function initMap() {
-            // Initialize the map
-            // 'map' is the ID of the div where the map will be displayed
-            // setView([latitude, longitude], zoom_level)
-            map = L.map('map').setView([55.6761, 12.5683], 12); // Centered on Copenhagen, zoomed in a bit more (level 12)
+        async function initMap() {
+            map = L.map('map').setView([55.6761, 12.5683], 12);
 
-            // Add an OpenStreetMap tile layer
-            // This is the base map layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
+
+            // Initialize the MarkerClusterGroup
+            markers = L.markerClusterGroup();
+            
+            // Call the function to add points from CSV
+            await addPointsFromCSV();
         }
 
-        // Call the initMap function when the DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', initMap);
+        async function addPointsFromCSV() {
+            try {
+                // Fetch the CSV file
+                const response = await fetch('filtered_unmet_demand.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
 
+                // Parse the CSV data
+                const lines = csvText.trim().split('\n');
+                const header = lines[0].split(','); // Assuming comma-separated
+                
+                // Find column index for the 'coordinates_search' column
+                const coordinatesSearchIndex = header.indexOf('coordinates_search'); 
+
+                if (coordinatesSearchIndex === -1) {
+                    console.error("CSV must contain a 'coordinates_search' column.");
+                    alert("Error: Missing 'coordinates_search' column in CSV.");
+                    return;
+                }
+
+                for (let i = 1; i < lines.length; i++) { // Start from 1 to skip header
+                    const values = lines[i].split(',');
+                    const coordinatesString = values[coordinatesSearchIndex];
+
+                    // Split the 'coordinates_search' string into latitude and longitude
+                    const coordParts = coordinatesString.split(',');
+                    if (coordParts.length === 2) {
+                        const lat = parseFloat(coordParts[0]);
+                        const lon = parseFloat(coordParts[1]);
+                    
+                        if (!isNaN(lat) && !isNaN(lon)) {
+                            const marker = L.marker([lat, lon]);
+                            // Optional: Add a popup for each marker
+                            marker.bindPopup(`Coordinates: ${coordinatesString}`); 
+                            // You can customize the popup content with more data from your CSV, e.g.,
+                            // marker.bindPopup(`<b>${values[header.indexOf('another_column')]}</b><br>Coordinates: ${coordinatesString}`);
+
+                            markers.addLayer(marker); // Add marker to the cluster group
+                        } else {
+                            console.warn(`Skipping row ${i+1}: Invalid coordinates in 'coordinates_search': ${coordinatesString}`);
+                        }
+                    } else {
+                        console.warn(`Skipping row ${i+1}: Malformed 'coordinates_search' format: ${coordinatesString}`);
+                    }
+                }
+
+                // Add the cluster group to the map
+                map.addLayer(markers);
+
+                console.log(`Added ${markers.getLayers().length} points from CSV.`);
+
+            } catch (error) {
+                console.error("Error loading or processing CSV data:", error);
+                alert("Could not load demand data. Check console for details.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
     </script>
 </body>
 </html>
