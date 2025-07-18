@@ -41,6 +41,7 @@
             margin-top: 0;
             margin-bottom: 10px;
             color: #333;
+            cursor: pointer; /* Add cursor pointer to indicate it's clickable */
         }
         #polygon-list-container ul {
             list-style: none;
@@ -73,9 +74,11 @@
     <div id="map"></div>
 
     <div id="polygon-list-container">
-        <h3>Polygon Point Counts</h3>
-        <ul id="polygon-counts-list">
+        <h3 id="polygon-list-header">Polygon Point Counts</h3>
+        <div id="polygon-list-content">
+            <ul id="polygon-counts-list">
             </ul>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -424,7 +427,24 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initMap);
+        // Event listener for toggling the polygon list visibility
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap(); 
+
+            const polygonListHeader = document.getElementById('polygon-list-header');
+            const polygonListContent = document.getElementById('polygon-list-content');
+
+            // Initially set the display based on your preference (e.g., 'block' to show by default)
+            polygonListContent.style.display = 'block'; 
+
+            polygonListHeader.addEventListener('click', () => {
+                if (polygonListContent.style.display === 'none') {
+                    polygonListContent.style.display = 'block';
+                } else {
+                    polygonListContent.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
