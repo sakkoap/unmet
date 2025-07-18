@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Copenhagen Map with Clustered Points & Clickable Polygons (OSM)</title>
+    <title>Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
 
@@ -42,6 +42,12 @@
             margin-bottom: 10px;
             color: #333;
             cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+            /* Add these for better mobile touch experience */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Standard */
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
         }
         #polygon-list-container ul {
             list-style: none;
@@ -427,23 +433,33 @@
             });
         }
 
-        // Event listener for toggling the polygon list visibility
         document.addEventListener('DOMContentLoaded', () => {
             initMap(); 
 
             const polygonListHeader = document.getElementById('polygon-list-header');
             const polygonListContent = document.getElementById('polygon-list-content');
 
-            // Initially set the display based on your preference (e.g., 'block' to show by default)
+            // Initially show the list content
             polygonListContent.style.display = 'block'; 
 
-            polygonListHeader.addEventListener('click', () => {
+            // Function to toggle the display
+            const toggleList = (e) => {
+                // Prevent default touch behavior (like zooming or text selection)
+                // This is crucial for mobile devices to ensure the tap is handled by our script
+                e.preventDefault(); 
                 if (polygonListContent.style.display === 'none') {
                     polygonListContent.style.display = 'block';
                 } else {
                     polygonListContent.style.display = 'none';
                 }
-            });
+            };
+
+            // Add click listener for desktops
+            polygonListHeader.addEventListener('click', toggleList);
+
+            // Add touchstart listener for mobile devices.
+            // Using 'touchstart' provides immediate feedback on tap.
+            polygonListHeader.addEventListener('touchstart', toggleList);
         });
     </script>
 </body>
