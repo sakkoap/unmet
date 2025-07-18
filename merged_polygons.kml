@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Folder>
+      <name>Simplified Polygons</name>
+      <Placemark>
+        <name>Polygon 2001</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.577777,55.6255898,0 12.5708676,55.6244268,0 12.5743866,55.6219794,0 12.5768328,55.6216159,0 12.577777,55.6255898,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2002</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5680781,55.6163329,0 12.5748587,55.6166964,0 12.5764466,55.6177628,0 12.569666,55.6186352,0 12.5680781,55.6163329,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2003</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6091012,55.6427979,0 12.610174,55.6396735,0 12.6303013,55.6426526,0 12.6235636,55.6470119,0 12.6091012,55.6427979,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2004</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6423176,55.6504989,0 12.6375969,55.6562858,0 12.6321896,55.6550268,0 12.6350649,55.6501599,0 12.6423176,55.6504989,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2005</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5181351,55.6901459,0 12.5202809,55.6876784,0 12.5314389,55.6916456,0 12.5299368,55.6937984,0 12.5204525,55.6943547,0 12.5181351,55.6901459,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2006</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.495007,55.672695,0 12.5085253,55.6719206,0 12.5095553,55.6762523,0 12.5018305,55.6766879,0 12.495007,55.672695,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2007</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.4805016,55.6709041,0 12.5004143,55.6662086,0 12.5023884,55.6689195,0 12.4821324,55.6732274,0 12.4805016,55.6709041,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2008</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5392956,55.655896,0 12.5429434,55.660738,0 12.5397677,55.6612705,0 12.5361199,55.6566224,0 12.5392956,55.655896,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2009</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5245644,55.6783046,0 12.5296766,55.677312,0 12.5316455,55.679829,0 12.5267102,55.6806517,0 12.5245644,55.6783046,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2010</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5937585,55.6813308,0 12.5947456,55.6822865,0 12.5925784,55.6832664,0 12.5917093,55.6824498,0 12.5934152,55.6814094,0 12.5937585,55.6813308,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2011</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5143693,55.6782091,0 12.5106786,55.6757409,0 12.5184033,55.6744341,0 12.5208066,55.6769992,0 12.5143693,55.6782091,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2012</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5904487,55.6969196,0 12.5872515,55.6951782,0 12.5894831,55.6944526,0 12.5924657,55.6953717,0 12.5904487,55.6969196,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2013</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.582724,55.6963512,0 12.5850843,55.6952024,0 12.5873159,55.6954201,0 12.5862001,55.6968108,0 12.5825737,55.6972219,0 12.582724,55.6963512,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2014</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5509657,55.675125,0 12.5511803,55.6756816,0 12.5518669,55.6770367,0 12.5422968,55.6789967,0 12.5398054,55.6773349,0 12.5509657,55.675125,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2015</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5423314,55.7062055,0 12.5411698,55.7036352,0 12.5431225,55.7031032,0 12.5451824,55.7055696,0 12.5423314,55.7062055,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2016</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.554751,55.6914739,0 12.5573122,55.6920097,0 12.557798,55.6941346,0 12.5559526,55.6946426,0 12.5542959,55.6941937,0 12.554751,55.6914739,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2017</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5784402,55.7006192,0 12.5790411,55.7026748,0 12.5735908,55.7039806,0 12.5716596,55.7025055,0 12.5784402,55.7006192,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2018</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5698016,55.7113089,0 12.5692564,55.7101523,0 12.5753503,55.7093544,0 12.5753449,55.7109689,0 12.5698016,55.7113089,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2019</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6097309,55.6822953,0 12.6061735,55.6758167,0 12.6082718,55.6752297,0 12.6113188,55.6813759,0 12.6097309,55.6822953,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2020</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.595433,55.6787924,0 12.599982,55.6779213,0 12.6005099,55.6793172,0 12.5980079,55.6804861,0 12.595433,55.6787924,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2021</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6077523,55.6611239,0 12.609426,55.6619711,0 12.6079668,55.664537,0 12.6080956,55.6664008,0 12.6070656,55.6666913,0 12.6055207,55.6657231,0 12.6065077,55.6647307,0 12.6045765,55.6637382,0 12.6077523,55.6611239,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2022</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6001153,55.6681195,0 12.6008019,55.6674176,0 12.6046214,55.6683132,0 12.6040206,55.6705156,0 12.5988707,55.669959,0 12.597712,55.6687972,0 12.6001153,55.6681195,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2023</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6117077,55.6774164,0 12.6076308,55.673714,0 12.609562,55.6730364,0 12.6157418,55.6751902,0 12.6117077,55.6774164,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2024</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.563889,55.6943497,0 12.5617003,55.6939385,0 12.5610995,55.6926081,0 12.5655627,55.6910358,0 12.5667643,55.6915196,0 12.5639976,55.6925923,0 12.563889,55.6943497,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2025</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5377106,55.694906,0 12.5376248,55.6972037,0 12.5364232,55.6983162,0 12.5338912,55.6984613,0 12.5319171,55.6962846,0 12.5377106,55.694906,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2026</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5894226,55.6533857,0 12.5866398,55.6484258,0 12.6008877,55.6506536,0 12.5997719,55.6529782,0 12.5894226,55.6533857,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2027</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5816187,55.6336999,0 12.5893435,55.6311319,0 12.5938496,55.6329004,0 12.590116,55.6367279,0 12.5830842,55.6373964,0 12.5816187,55.6336999,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2028</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5612341,55.7051859,0 12.5603277,55.703404,0 12.5624787,55.7035174,0 12.5621568,55.7058025,0 12.5612341,55.7051859,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2029</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5736796,55.7190269,0 12.5733792,55.7190994,0 12.5817906,55.7138296,0 12.5862109,55.7153042,0 12.5799023,55.7209607,0 12.5743233,55.7212749,0 12.5736796,55.7190269,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2030</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5280719,55.6527697,0 12.5206904,55.6571278,0 12.5153689,55.6562562,0 12.52435,55.6526014,0 12.5280719,55.6527697,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2031</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6174343,55.6658528,0 12.6183141,55.6641523,0 12.6199877,55.6647272,0 12.6187325,55.6663792,0 12.6174343,55.6658528,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2032</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.6114154,55.6687996,0 12.6096988,55.6676015,0 12.6114798,55.6665729,0 12.6136899,55.6664639,0 12.6154709,55.6681582,0 12.6114154,55.6687996,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2033</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5786097,55.6794474,0 12.5777085,55.6785038,0 12.5831158,55.6786006,0 12.5829441,55.6796047,0 12.578953,55.6794595,0 12.5786097,55.6794474,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2034</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.614892,55.6949865,0 12.6153641,55.697139,0 12.6101284,55.6972358,0 12.6077251,55.6969697,0 12.6078008,55.695655,0 12.6130466,55.6941883,0 12.614892,55.6949865,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+      <Placemark>
+        <name>Polygon 2035</name>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                12.5276887,55.642952,0 12.532109,55.647069,0 12.526487,55.6477713,0 12.5229251,55.6479892,0 12.5235259,55.6463425,0 12.5276887,55.642952,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
