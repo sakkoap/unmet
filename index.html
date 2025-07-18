@@ -32,9 +32,10 @@
             z-index: 1000; /* Ensure it's above the map */
             max-height: calc(100% - 20px); /* Limit height to prevent overflow */
             overflow-y: auto; /* Enable scrolling if list is long */
-            width: 250px; /* Adjust width as needed */
+            width: 280px; /* Adjusted width */
             font-family: sans-serif;
             font-size: 14px;
+            color: #333;
         }
         #polygon-list-container h3 {
             margin-top: 0;
@@ -47,11 +48,16 @@
             margin: 0;
         }
         #polygon-list-container li {
-            padding: 5px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #eee;
+            cursor: pointer; /* Indicate clickable */
+            transition: background-color 0.2s ease;
         }
         #polygon-list-container li:last-child {
             border-bottom: none;
+        }
+        #polygon-list-container li:hover {
+            background-color: #f0f0f0;
         }
         .polygon-name {
             font-weight: bold;
@@ -82,6 +88,24 @@
         let map;
         let markers; // Marker cluster group for points
         let allPointsData = []; // To store parsed point data (lat, lon, other properties) for analysis
+        let highlightedPolygon = null; // To keep track of the currently highlighted polygon
+
+        // Define default and highlight styles for polygons
+        const defaultPolygonStyle = {
+            color: '#0000FF', // Blue border
+            weight: 2,
+            opacity: 0.7,
+            fillColor: '#0000FF', // Blue fill
+            fillOpacity: 0.2
+        };
+
+        const highlightPolygonStyle = {
+            color: '#FF0000', // Red border
+            weight: 4,
+            opacity: 1,
+            fillColor: '#FFFF00', // Yellow fill
+            fillOpacity: 0.5
+        };
 
         async function initMap() {
             map = L.map('map').setView([55.6761, 12.5683], 12);
@@ -158,61 +182,96 @@
             });
         }
 
+        // Function to highlight a polygon layer on the map
+        function highlightPolygon(layer) {
+            // Reset style of previously highlighted polygon, if any
+            if (highlightedPolygon && highlightedPolygon !== layer) {
+                highlightedPolygon.setStyle(defaultPolygonStyle);
+            }
+
+            // Apply highlight style to the current layer
+            layer.setStyle(highlightPolygonStyle);
+            highlightedPolygon = layer;
+
+            // Pan and zoom to the highlighted polygon
+            map.fitBounds(layer.getBounds(), { padding: [50, 50] }); // Add some padding
+        }
+
         async function addPolygonsFromKML() {
             return new Promise((resolve, reject) => {
-                const polygonCountsList = document.getElementById('polygon-counts-list'); // Get the UL element
+                const polygonCountsList = document.getElementById('polygon-counts-list');
+                const polygonsForDisplay = []; // Array to store polygon data for sorting
 
-                omnivore.kml('merged_polygons.xml')
-                    .on('ready', function() {
-                        const fragment = document.createDocumentFragment(); // Use a document fragment for efficient DOM updates
+                omnivore.kml('merged_polygons.xml', null, { // Add a default style to omnivore so we can reset to it
+                    style: function (feature) {
+                        return defaultPolygonStyle; // Apply default style initially
+                    }
+                })
+                .on('ready', function() {
+                    this.eachLayer(function(layer) {
+                        if (layer instanceof L.Polygon || layer instanceof L.MultiPolygon) {
+                            const polygonGeoJSON = layer.toGeoJSON();
+                            const polygonName = layer.feature && layer.feature.properties && layer.feature.properties.name 
+                                ? layer.feature.properties.name 
+                                : 'Unnamed Polygon';
 
-                        this.eachLayer(function(layer) {
-                            // Ensure it's a polygon (or multlipolygon) layer before adding click listener
-                            if (layer instanceof L.Polygon || layer instanceof L.MultiPolygon) {
-                                const polygonGeoJSON = layer.toGeoJSON();
-                                const polygonName = layer.feature && layer.feature.properties && layer.feature.properties.name 
-                                    ? layer.feature.properties.name 
-                                    : 'Unnamed Polygon';
+                            let pointsInside = 0;
+                            allPointsData.forEach(pointData => {
+                                const point = turf.point([pointData.lon, pointData.lat]);
+                                if (turf.booleanPointInPolygon(point, polygonGeoJSON)) {
+                                    pointsInside++;
+                                }
+                            });
 
-                                let pointsInside = 0;
+                            // Store data including the Leaflet layer reference
+                            polygonsForDisplay.push({
+                                name: polygonName,
+                                pointsCount: pointsInside,
+                                layer: layer // Store reference to the actual Leaflet layer
+                            });
+
+                            // Add existing click listener for map popups
+                            layer.on('click', function(e) {
+                                const clickedPolygon = e.target;
+                                let clickedPointsInside = 0;
                                 allPointsData.forEach(pointData => {
-                                    const point = turf.point([pointData.lon, pointData.lat]); // Turf expects [lon, lat]
-                                    if (turf.booleanPointInPolygon(point, polygonGeoJSON)) {
-                                        pointsInside++;
+                                    const point = turf.point([pointData.lon, pointData.lat]);
+                                    if (turf.booleanPointInPolygon(point, clickedPolygon.toGeoJSON())) {
+                                        clickedPointsInside++;
                                     }
                                 });
+                                clickedPolygon.bindPopup(`Points within: <b>${clickedPointsInside}</b>`).openPopup(e.latlng);
+                                highlightPolygon(clickedPolygon); // Highlight when clicked on map as well
+                            });
+                        }
+                    });
 
-                                // Create list item for the overlay
-                                const listItem = document.createElement('li');
-                                listItem.innerHTML = `<span class="polygon-name">${polygonName}</span>: <span class="point-count">${pointsInside} points</span>`;
-                                fragment.appendChild(listItem);
+                    // Sort the polygons by number of points (descending)
+                    polygonsForDisplay.sort((a, b) => b.pointsCount - a.pointsCount);
 
-                                // Add existing click listener for popups
-                                layer.on('click', function(e) {
-                                    const clickedPolygon = e.target;
-                                    // Recalculate for popup to ensure consistency, though it's already done above
-                                    let clickedPointsInside = 0;
-                                    allPointsData.forEach(pointData => {
-                                        const point = turf.point([pointData.lon, pointData.lat]);
-                                        if (turf.booleanPointInPolygon(point, clickedPolygon.toGeoJSON())) {
-                                            clickedPointsInside++;
-                                        }
-                                    });
-                                    clickedPolygon.bindPopup(`Points within: <b>${clickedPointsInside}</b>`).openPopup(e.latlng);
-                                });
-                            }
+                    // Build and populate the list from the sorted array
+                    const fragment = document.createDocumentFragment();
+                    polygonsForDisplay.forEach(polygonData => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<span class="polygon-name">${polygonData.name}</span>: <span class="point-count">${polygonData.pointsCount} points</span>`;
+                        
+                        // Add click listener to the list item
+                        listItem.addEventListener('click', () => {
+                            highlightPolygon(polygonData.layer); // Call highlight function with the stored layer
                         });
+                        fragment.appendChild(listItem);
+                    });
 
-                        polygonCountsList.appendChild(fragment); // Add all list items at once
-                        console.log(`Added polygons from KML and generated list.`);
-                        resolve();
-                    })
-                    .on('error', function(error) {
-                        console.error("Error loading KML:", error);
-                        alert("Could not load polygon data. Check console for details.");
-                        reject(error);
-                    })
-                    .addTo(map);
+                    polygonCountsList.appendChild(fragment);
+                    console.log(`Added polygons from KML, sorted list, and configured highlighting.`);
+                    resolve();
+                })
+                .on('error', function(error) {
+                    console.error("Error loading KML:", error);
+                    alert("Could not load polygon data. Check console for details.");
+                    reject(error);
+                })
+                .addTo(map);
             });
         }
 
