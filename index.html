@@ -6,7 +6,6 @@
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
@@ -21,19 +20,62 @@
             padding: 0;
             overflow: hidden;
         }
+        /* Style for the overlay list */
+        #polygon-list-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000; /* Ensure it's above the map */
+            max-height: calc(100% - 20px); /* Limit height to prevent overflow */
+            overflow-y: auto; /* Enable scrolling if list is long */
+            width: 250px; /* Adjust width as needed */
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        #polygon-list-container h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        #polygon-list-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #polygon-list-container li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        #polygon-list-container li:last-child {
+            border-bottom: none;
+        }
+        .polygon-name {
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .point-count {
+            color: #555;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
 
+    <div id="polygon-list-container">
+        <h3>Polygon Point Counts</h3>
+        <ul id="polygon-counts-list">
+            </ul>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-
     <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
-
     <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
     <script>
@@ -75,7 +117,7 @@
                         }
 
                         data.forEach((row, index) => {
-                            const coordinatesString = row['coordinates_search']; 
+                            const coordinatesString = row['coordinates_search'];
                             
                             if (coordinatesString) {
                                 const coordParts = coordinatesString.split(',');
@@ -85,7 +127,7 @@
                                     
                                     if (!isNaN(lat) && !isNaN(lon)) {
                                         const marker = L.marker([lat, lon]);
-                                        marker.bindPopup(`Coordinates: ${coordinatesString}`); 
+                                        marker.bindPopup(`Coordinates: ${coordinatesString}`);
                                         allPointsData.push({
                                             lat: lat,
                                             lon: lon,
@@ -118,30 +160,51 @@
 
         async function addPolygonsFromKML() {
             return new Promise((resolve, reject) => {
-                // CHANGED KML file name here:
+                const polygonCountsList = document.getElementById('polygon-counts-list'); // Get the UL element
+
                 omnivore.kml('merged_polygons.xml')
                     .on('ready', function() {
+                        const fragment = document.createDocumentFragment(); // Use a document fragment for efficient DOM updates
+
                         this.eachLayer(function(layer) {
                             // Ensure it's a polygon (or multlipolygon) layer before adding click listener
                             if (layer instanceof L.Polygon || layer instanceof L.MultiPolygon) {
+                                const polygonGeoJSON = layer.toGeoJSON();
+                                const polygonName = layer.feature && layer.feature.properties && layer.feature.properties.name 
+                                    ? layer.feature.properties.name 
+                                    : 'Unnamed Polygon';
+
+                                let pointsInside = 0;
+                                allPointsData.forEach(pointData => {
+                                    const point = turf.point([pointData.lon, pointData.lat]); // Turf expects [lon, lat]
+                                    if (turf.booleanPointInPolygon(point, polygonGeoJSON)) {
+                                        pointsInside++;
+                                    }
+                                });
+
+                                // Create list item for the overlay
+                                const listItem = document.createElement('li');
+                                listItem.innerHTML = `<span class="polygon-name">${polygonName}</span>: <span class="point-count">${pointsInside} points</span>`;
+                                fragment.appendChild(listItem);
+
+                                // Add existing click listener for popups
                                 layer.on('click', function(e) {
                                     const clickedPolygon = e.target;
-                                    const polygonGeoJSON = clickedPolygon.toGeoJSON();
-                                    
-                                    let pointsInside = 0;
+                                    // Recalculate for popup to ensure consistency, though it's already done above
+                                    let clickedPointsInside = 0;
                                     allPointsData.forEach(pointData => {
-                                        const point = turf.point([pointData.lon, pointData.lat]); // Turf expects [lon, lat]
-                                        if (turf.booleanPointInPolygon(point, polygonGeoJSON)) {
-                                            pointsInside++;
+                                        const point = turf.point([pointData.lon, pointData.lat]);
+                                        if (turf.booleanPointInPolygon(point, clickedPolygon.toGeoJSON())) {
+                                            clickedPointsInside++;
                                         }
                                     });
-
-                                    // Display the count in a popup
-                                    clickedPolygon.bindPopup(`Points within: <b>${pointsInside}</b>`).openPopup(e.latlng);
+                                    clickedPolygon.bindPopup(`Points within: <b>${clickedPointsInside}</b>`).openPopup(e.latlng);
                                 });
                             }
                         });
-                        console.log(`Added polygons from KML.`);
+
+                        polygonCountsList.appendChild(fragment); // Add all list items at once
+                        console.log(`Added polygons from KML and generated list.`);
                         resolve();
                     })
                     .on('error', function(error) {
