@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Copenhagen Map with Clustered Points (OSM)</title>
+    <title>Copenhagen Map with Clustered Points & Clickable Polygons (OSM)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
 
@@ -32,9 +32,14 @@
 
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
+    <script src="https://unpkg.com/leaflet-omnivore@0.3.4/omnivore.min.js"></script>
+
+    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
     <script>
         let map;
-        let markers; // Declare the marker cluster group
+        let markers; // Marker cluster group for points
+        let allPointsData = []; // To store parsed point data (lat, lon, other properties) for analysis
 
         async function initMap() {
             map = L.map('map').setView([55.6761, 12.5683], 12);
@@ -44,18 +49,19 @@
             }).addTo(map);
 
             // Initialize the MarkerClusterGroup with maxClusterRadius option
-            // A smaller value means clusters will break apart sooner (cluster less)
             markers = L.markerClusterGroup({
                 maxClusterRadius: 40 // Experiment with this value (default is 80)
             });
             
-            // Call the function to add points from CSV
+            // First, load and process the points (CSV)
             await addPointsFromCSV();
+
+            // Then, load the polygons (KML)
+            await addPolygonsFromKML();
         }
 
         async function addPointsFromCSV() {
-            try {
-                // Use Papa Parse to fetch and parse the CSV file
+            return new Promise((resolve, reject) => {
                 Papa.parse('filtered_unmet_demand.csv', {
                     download: true,
                     header: true,
@@ -80,7 +86,12 @@
                                     if (!isNaN(lat) && !isNaN(lon)) {
                                         const marker = L.marker([lat, lon]);
                                         marker.bindPopup(`Coordinates: ${coordinatesString}`); 
-                                        markers.addLayer(marker);
+                                        allPointsData.push({
+                                            lat: lat,
+                                            lon: lon,
+                                            originalRow: row // Keep original row data if you need more info in popup
+                                        });
+                                        markers.addLayer(marker); // Add marker to the cluster group
                                     } else {
                                         console.warn(`Skipping row ${index + 2}: Invalid latitude or longitude in 'coordinates_search': ${coordinatesString}`);
                                     }
@@ -94,17 +105,52 @@
 
                         map.addLayer(markers);
                         console.log(`Added ${markers.getLayers().length} points from CSV.`);
+                        resolve();
                     },
                     error: function(err) {
                         console.error("Papa Parse error during download or parsing:", err);
                         alert("Could not load demand data. Check console for details.");
+                        reject(err);
                     }
                 });
+            });
+        }
 
-            } catch (error) {
-                console.error("Network error fetching CSV:", error);
-                alert("Network error fetching CSV. Check console for details.");
-            }
+        async function addPolygonsFromKML() {
+            return new Promise((resolve, reject) => {
+                // CHANGED KML file name here:
+                omnivore.kml('merged_polygons.kml')
+                    .on('ready', function() {
+                        this.eachLayer(function(layer) {
+                            // Ensure it's a polygon (or multlipolygon) layer before adding click listener
+                            if (layer instanceof L.Polygon || layer instanceof L.MultiPolygon) {
+                                layer.on('click', function(e) {
+                                    const clickedPolygon = e.target;
+                                    const polygonGeoJSON = clickedPolygon.toGeoJSON();
+                                    
+                                    let pointsInside = 0;
+                                    allPointsData.forEach(pointData => {
+                                        const point = turf.point([pointData.lon, pointData.lat]); // Turf expects [lon, lat]
+                                        if (turf.booleanPointInPolygon(point, polygonGeoJSON)) {
+                                            pointsInside++;
+                                        }
+                                    });
+
+                                    // Display the count in a popup
+                                    clickedPolygon.bindPopup(`Points within: <b>${pointsInside}</b>`).openPopup(e.latlng);
+                                });
+                            }
+                        });
+                        console.log(`Added polygons from KML.`);
+                        resolve();
+                    })
+                    .on('error', function(error) {
+                        console.error("Error loading KML:", error);
+                        alert("Could not load polygon data. Check console for details.");
+                        reject(error);
+                    })
+                    .addTo(map);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', initMap);
