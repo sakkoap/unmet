@@ -202,7 +202,8 @@
                 const polygonCountsList = document.getElementById('polygon-counts-list');
                 const polygonsForDisplay = []; // Array to store polygon data for sorting
 
-                omnivore.kml('merged_polygons.xml', null, { // Add a default style to omnivore so we can reset to it
+                // CORRECTED: Pass style options as the SECOND argument
+                omnivore.kml('merged_polygons.xml', {
                     style: function (feature) {
                         return defaultPolygonStyle; // Apply default style initially
                     }
