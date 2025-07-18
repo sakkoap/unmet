@@ -215,7 +215,7 @@
                                         if (!isNaN(lat) && !isNaN(lon)) {
                                             // Create a black circle marker (dot)
                                             const circle = L.circleMarker([lat, lon], {
-                                                radius: 2, // Made smaller (e.g., from 4 to 2)
+                                                radius: 0.5, // Made smaller (e.g., from 4 to 2)
                                                 fillColor: '#000000', // Black fill
                                                 color: '#000000', // Black border
                                                 weight: 1, // Border thickness
@@ -226,7 +226,6 @@
                                             // Updated: Add ID, Antal Pladser, and Stativ Ejer to popup
                                             circle.bindPopup(`
                                                 <b>ID:</b> ${row['id'] || 'N/A'}<br>
-                                                <b>Stativ Type:</b> ${row['stativ_type'] || 'N/A'}<br>
                                                 <b>Placering:</b> ${row['stativ_placering'] || 'N/A'}<br>
                                                 <b>Antal Pladser:</b> ${row['antal_pladser'] || 'N/A'}<br>
                                                 <b>Stativ Ejer:</b> ${row['stativ_ejer'] || 'N/A'}
