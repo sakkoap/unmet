@@ -215,7 +215,7 @@
                                         if (!isNaN(lat) && !isNaN(lon)) {
                                             // Create a black circle marker (dot)
                                             const circle = L.circleMarker([lat, lon], {
-                                                radius: 4, // Size of the dot
+                                                radius: 2, // Made smaller (e.g., from 4 to 2)
                                                 fillColor: '#000000', // Black fill
                                                 color: '#000000', // Black border
                                                 weight: 1, // Border thickness
@@ -223,11 +223,13 @@
                                                 fillOpacity: 1 // Fill opacity
                                             }).addTo(map); // Add directly to map, not to cluster group
 
-                                            // Optional: Add a popup with relevant info
+                                            // Updated: Add ID, Antal Pladser, and Stativ Ejer to popup
                                             circle.bindPopup(`
+                                                <b>ID:</b> ${row['id'] || 'N/A'}<br>
                                                 <b>Stativ Type:</b> ${row['stativ_type'] || 'N/A'}<br>
                                                 <b>Placering:</b> ${row['stativ_placering'] || 'N/A'}<br>
-                                                <b>Antal Pladser:</b> ${row['antal_pladser'] || 'N/A'}
+                                                <b>Antal Pladser:</b> ${row['antal_pladser'] || 'N/A'}<br>
+                                                <b>Stativ Ejer:</b> ${row['stativ_ejer'] || 'N/A'}
                                             `);
                                             addedBikeRacks++;
                                         } else {
